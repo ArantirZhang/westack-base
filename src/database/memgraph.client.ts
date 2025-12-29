@@ -31,7 +31,12 @@ export class MemgraphClient {
     try {
       this.driver = neo4j.driver(
         this.uri,
-        this.username ? neo4j.auth.basic(this.username, this.password) : neo4j.auth.basic('', '')
+        this.username ? neo4j.auth.basic(this.username, this.password) : neo4j.auth.basic('', ''),
+        {
+          encrypted: false,  // Memgraph typically runs without encryption in development
+          maxConnectionPoolSize: 50,
+          connectionTimeout: 5000
+        }
       );
 
       // Verify connectivity
