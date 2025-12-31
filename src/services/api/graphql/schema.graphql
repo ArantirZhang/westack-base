@@ -1,0 +1,224 @@
+# WeStack BMS - Entity-Component System GraphQL Schema
+# Using Brick Schema for component types (composition over inheritance)
+
+# ============================================
+# Core ECS Types
+# ============================================
+
+type Entity {
+  id: ID!
+  components: [Component!]!
+  relationships: [Relationship!]!
+  createdAt: String!
+  updatedAt: String!
+
+  # Timeseries data from InfluxDB
+  metrics(start: String!, end: String, interval: String): [TimeseriesDataPoint!]!
+}
+
+type Component {
+  componentType: String!    # e.g., "Equipment", "HVAC_Equipment", "AHU"
+  properties: JSON!         # Component-specific data
+}
+
+type ComponentType {
+  name: String!
+  properties: [PropertyDefinition!]!
+  isBrickSchema: Boolean!   # true if from Brick Schema, false if custom
+  description: String
+}
+
+type PropertyDefinition {
+  name: String!
+  type: PropertyType!       # String, Number, Boolean, Date, JSON
+  required: Boolean!
+  description: String
+}
+
+enum PropertyType {
+  String
+  Number
+  Boolean
+  Date
+  JSON
+}
+
+# ============================================
+# Relationship Types
+# ============================================
+
+type Relationship {
+  type: String!             # e.g., "feeds", "controls", "hasPoint"
+  target: Entity!
+  properties: JSON
+}
+
+type RelationshipType {
+  name: String!
+  fromEntity: String!       # Component type or "Any"
+  toEntity: String!
+  properties: [PropertyDefinition!]!
+  isBrickSchema: Boolean!
+  description: String
+}
+
+# ============================================
+# Timeseries Types (InfluxDB)
+# ============================================
+
+type TimeseriesDataPoint {
+  timestamp: String!
+  value: Float!
+  tags: JSON
+}
+
+# ============================================
+# Input Types
+# ============================================
+
+input ComponentInput {
+  componentType: String!
+  properties: JSON!
+}
+
+input PropertyDefinitionInput {
+  name: String!
+  type: PropertyType!
+  required: Boolean!
+  description: String
+}
+
+input CreateEntityInput {
+  id: ID!
+  components: [ComponentInput!]!
+}
+
+input UpdateEntityInput {
+  components: [ComponentInput!]
+}
+
+input DefineComponentTypeInput {
+  name: String!
+  properties: [PropertyDefinitionInput!]!
+  description: String
+}
+
+input DefineRelationshipTypeInput {
+  name: String!
+  fromEntity: String!
+  toEntity: String!
+  properties: [PropertyDefinitionInput!]
+  description: String
+}
+
+input CreateRelationshipInput {
+  fromId: ID!
+  toId: ID!
+  type: String!
+  properties: JSON
+}
+
+# ============================================
+# Queries
+# ============================================
+
+type Query {
+  # System Health
+  hello: String!
+  health: String!
+  version: String!
+  systemInfo: SystemInfo!
+  databaseHealth: DatabaseHealth!
+
+  # Entity Queries
+  entity(id: ID!): Entity
+  entities(componentType: String, limit: Int, offset: Int): [Entity!]!
+
+  # Component Type Registry
+  componentTypes: [ComponentType!]!
+  componentType(name: String!): ComponentType
+  brickComponentTypes: [ComponentType!]!     # Brick Schema only
+  customComponentTypes: [ComponentType!]!    # User-defined only
+
+  # Relationship Type Registry
+  relationshipTypes: [RelationshipType!]!
+  relationshipType(name: String!): RelationshipType
+  brickRelationshipTypes: [RelationshipType!]!
+
+  # Entity Relationship Queries
+  entityRelationships(entityId: ID!, type: String): [Relationship!]!
+  findPath(fromId: ID!, toId: ID!, maxDepth: Int): PathResult
+}
+
+# ============================================
+# Mutations
+# ============================================
+
+type Mutation {
+  # Entity Operations
+  createEntity(input: CreateEntityInput!): Entity!
+  updateEntity(id: ID!, input: UpdateEntityInput!): Entity!
+  deleteEntity(id: ID!): Boolean!
+
+  # Component Operations (Dynamic)
+  addComponent(entityId: ID!, componentType: String!, properties: JSON!): Entity!
+  removeComponent(entityId: ID!, componentType: String!): Entity!
+  updateComponent(entityId: ID!, componentType: String!, properties: JSON!): Entity!
+
+  # Custom Type Definitions (Extend Brick Schema)
+  defineComponentType(input: DefineComponentTypeInput!): ComponentType!
+  defineRelationshipType(input: DefineRelationshipTypeInput!): RelationshipType!
+
+  # Relationship Operations
+  createRelationship(input: CreateRelationshipInput!): Boolean!
+  deleteRelationship(fromId: ID!, toId: ID!, type: String!): Boolean!
+}
+
+# ============================================
+# Supporting Types
+# ============================================
+
+type SystemInfo {
+  status: String!
+  timestamp: String!
+  version: String!
+  uptime: Float!
+  brickSchemaLoaded: Boolean!
+  componentTypeCount: Int!
+  relationshipTypeCount: Int!
+}
+
+type DatabaseHealth {
+  memgraph: DatabaseStatus!
+  influxdb: DatabaseStatus!
+  overall: String!
+}
+
+type DatabaseStatus {
+  connected: Boolean!
+  healthy: Boolean!
+  message: String
+}
+
+type PathResult {
+  nodes: [PathNode!]!
+  relationships: [PathRelationship!]!
+  length: Int!
+}
+
+type PathNode {
+  id: ID!
+  labels: [String!]!
+  properties: JSON!
+}
+
+type PathRelationship {
+  type: String!
+  properties: JSON
+}
+
+# ============================================
+# Scalar Types
+# ============================================
+
+scalar JSON

@@ -4,7 +4,8 @@
   "description": "Vendor-neutral BMS Data Layer with MQTT ingestion and InfluxDB + Memgraph storage",
   "main": "dist/index.js",
   "scripts": {
-    "build": "tsc",
+    "build": "tsc && npm run copy-files",
+    "copy-files": "mkdir -p dist/services/api/graphql && cp src/services/api/graphql/schema.graphql dist/services/api/graphql/ && mkdir -p dist/database/graph-schema && cp src/database/graph-schema/*.cypher dist/database/graph-schema/",
     "start": "node dist/index.js",
     "dev": "nodemon --watch src --exec ts-node src/index.ts",
     "test": "jest",

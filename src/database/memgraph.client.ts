@@ -147,6 +147,36 @@ export class MemgraphClient {
   }
 
   /**
+   * Execute a read transaction with callback (Neo4j v6 pattern)
+   * Provides access to the transaction object
+   */
+  async executeReadTx(
+    callback: (tx: any) => Promise<any>
+  ): Promise<any> {
+    const session = this.getSession();
+    try {
+      return await session.executeRead(callback);
+    } finally {
+      await session.close();
+    }
+  }
+
+  /**
+   * Execute a write transaction with callback (Neo4j v6 pattern)
+   * Provides access to the transaction object
+   */
+  async executeWriteTx(
+    callback: (tx: any) => Promise<any>
+  ): Promise<any> {
+    const session = this.getSession();
+    try {
+      return await session.executeWrite(callback);
+    } finally {
+      await session.close();
+    }
+  }
+
+  /**
    * Get database statistics
    */
   async getStats(): Promise<{

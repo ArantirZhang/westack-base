@@ -166,6 +166,29 @@ export class InfluxDBClient {
 
     return this.query(fluxQuery);
   }
+
+  /**
+   * Get bucket name
+   */
+  getBucket(): string {
+    return this.bucket;
+  }
+
+  /**
+   * Delete data from InfluxDB
+   * Note: Delete API not available in current influxdb-client version
+   * Use InfluxDB UI or CLI for data deletion
+   */
+  async deleteData(
+    _measurement: string,
+    _start: Date,
+    _end: Date,
+    _predicate: string
+  ): Promise<void> {
+    // TODO: Implement when delete API becomes available
+    console.warn('deleteData not implemented - use InfluxDB UI or CLI');
+    throw new Error('Delete API not available in current influxdb-client version');
+  }
 }
 
 // Singleton instance
