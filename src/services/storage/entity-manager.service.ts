@@ -32,8 +32,8 @@ export class EntityManager {
         `
         CREATE (e:Entity {
           id: $id,
-          createdAt: datetime(),
-          updatedAt: datetime()
+          createdAt: timestamp(),
+          updatedAt: timestamp()
         })
         `,
         { id: input.id }
@@ -206,7 +206,7 @@ export class EntityManager {
       await tx.run(
         `
         MATCH (e:Entity {id: $id})
-        SET e.updatedAt = datetime()
+        SET e.updatedAt = timestamp()
         `,
         { id }
       );
@@ -273,7 +273,7 @@ export class EntityManager {
           properties: $properties
         })
         CREATE (e)-[:HAS_COMPONENT]->(c)
-        SET e.updatedAt = datetime()
+        SET e.updatedAt = timestamp()
         `,
         {
           entityId,
@@ -305,7 +305,7 @@ export class EntityManager {
         `
         MATCH (e:Entity {id: $entityId})-[r:HAS_COMPONENT]->(c:Component {type: $componentType})
         DELETE r, c
-        SET e.updatedAt = datetime()
+        SET e.updatedAt = timestamp()
         `,
         { entityId, componentType }
       );
@@ -340,7 +340,7 @@ export class EntityManager {
         `
         MATCH (e:Entity {id: $entityId})-[:HAS_COMPONENT]->(c:Component {type: $componentType})
         SET c.properties = $properties,
-            e.updatedAt = datetime()
+            e.updatedAt = timestamp()
         `,
         {
           entityId,

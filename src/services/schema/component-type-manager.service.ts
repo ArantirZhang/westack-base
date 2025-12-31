@@ -28,7 +28,7 @@ export class ComponentTypeManager {
         SET ct.properties = $properties,
             ct.isBrickSchema = $isBrickSchema,
             ct.description = $description,
-            ct.updatedAt = datetime()
+            ct.updatedAt = timestamp()
         `,
         {
           name: data.name,

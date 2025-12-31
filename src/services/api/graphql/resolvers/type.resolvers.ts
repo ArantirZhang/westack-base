@@ -68,6 +68,13 @@ export const typeResolvers = {
     to: async (parent: any) => {
       return entityManager.getEntity(parent.toId);
     },
+
+    /**
+     * Resolve target entity (deprecated, use 'to' instead)
+     */
+    target: async (parent: any) => {
+      return entityManager.getEntity(parent.toId);
+    },
   },
 
   // ============================================

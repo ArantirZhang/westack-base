@@ -110,6 +110,19 @@ export class MemgraphClient {
   }
 
   /**
+   * Run a schema command without transaction (for CREATE INDEX, CREATE CONSTRAINT)
+   * Memgraph doesn't allow schema operations in transactions
+   */
+  async runSchemaCommand(query: string): Promise<void> {
+    const session = this.getSession();
+    try {
+      await session.run(query);
+    } finally {
+      await session.close();
+    }
+  }
+
+  /**
    * Execute a query and return a single result
    */
   async executeReadSingle<T>(

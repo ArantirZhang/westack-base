@@ -48,13 +48,15 @@ export class SchemaInitializer {
 
     for (const statement of statements) {
       try {
-        await this.memgraph.executeWrite(statement, {});
+        // Use runSchemaCommand instead of executeWrite to avoid transaction wrapping
+        await this.memgraph.runSchemaCommand(statement);
         console.log(`  ✓ ${statement.substring(0, 60)}...`);
       } catch (error: any) {
         // Ignore errors for constraints/indexes that already exist
         if (
           error.message?.includes('already exists') ||
-          error.message?.includes('Constraint already exists')
+          error.message?.includes('Constraint already exists') ||
+          error.message?.includes('Index already exists')
         ) {
           console.log(`  ⊙ Already exists: ${statement.substring(0, 60)}...`);
         } else {

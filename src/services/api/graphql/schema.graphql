@@ -49,7 +49,11 @@ enum PropertyType {
 
 type Relationship {
   type: String!             # e.g., "feeds", "controls", "hasPoint"
-  target: Entity!
+  fromId: ID!               # Source entity ID
+  toId: ID!                 # Target entity ID
+  from: Entity              # Source entity (resolved)
+  to: Entity                # Target entity (resolved)
+  target: Entity!           # Deprecated: use 'to' instead
   properties: JSON
 }
 

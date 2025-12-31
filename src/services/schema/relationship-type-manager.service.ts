@@ -32,7 +32,7 @@ export class RelationshipTypeManager {
             rt.properties = $properties,
             rt.isBrickSchema = $isBrickSchema,
             rt.description = $description,
-            rt.updatedAt = datetime()
+            rt.updatedAt = timestamp()
         `,
         {
           name: data.name,
