@@ -1,26 +1,43 @@
 # WeStack BMS - Implementation Roadmap
 
-**Last Updated**: December 31, 2025
-**Current Status**: ✅ Dynamic Brick Schema Upload Implemented
+**Last Updated**: January 4, 2026
+**Current Status**: ✅ Documentation Cleanup + TDD Adoption Complete
 **Version**: 1.0.0
+**Development Approach**: Test-Driven Development (TDD)
+
+---
+
+## 📋 Documentation Policy
+
+This project maintains **exactly 3 documentation files**:
+1. **README.md** - How to run and use the project
+2. **ARCHITECTURE.md** - How the system is designed
+3. **ROADMAP.md** - Where the project is going (this file)
+
+**Rules:**
+- ❌ No additional .md files
+- ❌ No example code in documentation
+- ✅ Always update this ROADMAP with progress
+- ✅ Use Test-Driven Development (TDD)
 
 ---
 
 ## 🎯 Project Status
 
-### Current Phase: Dynamic Brick Schema Upload Implemented
+### Current Phase: Documentation Cleanup + TDD Adoption Complete
 
 **Dependencies**: ✅ All upgraded to latest versions (Dec 27, 2025)
 **Security**: ✅ 0 vulnerabilities
-**Documentation**: ✅ Complete (150+ pages)
+**Documentation**: ✅ Streamlined to 3 files (README, ARCHITECTURE, ROADMAP)
+**Development**: ✅ Test-Driven Development (TDD) adopted
 **Server**: ✅ Apollo Server v4 running with ECS GraphQL schema
 **Databases**: ✅ InfluxDB + Memgraph clients operational
 **GraphQL**: ✅ Full ECS schema with Entity/Component/Relationship types
 **Brick Schema**: ✅ Dynamic upload via GraphQL mutation
-**Architecture**: ✅ Simplified - no isBrickSchema distinction
+**Architecture**: ✅ Hybrid ECS (Entities use ECS, Relationships use native edges)
 **Docker**: ✅ All containers healthy (app, memgraph, influxdb, mosquitto)
 **Tests**: ✅ Integration tests + upload verified
-**Next Step**: Week 3 - MQTT Ingestion Pipeline
+**Next Step**: Week 3 - MQTT Ingestion Pipeline (with TDD)
 
 ### What's Been Completed (December 27-31, 2025)
 
@@ -109,10 +126,11 @@ Testing:              ████░░░░░░░░░░░░░░░�
 - ✅ **Milestone 2**: Complete Upgrade (Dec 27, 2025)
 - ✅ **Milestone 3**: Working Server (Dec 27, 2025)
 - ✅ **Milestone 4**: ECS + Brick Schema (Dec 31, 2025)
-- ✅ **Milestone 5**: Dynamic Brick Schema Upload (Dec 31, 2025) 🎉
-- ⏳ **Milestone 6**: MQTT Pipeline (Week 3)
-- ⏳ **Milestone 7**: AI Features (Future)
-- ⏳ **Milestone 8**: Production Ready (Future)
+- ✅ **Milestone 5**: Dynamic Brick Schema Upload (Dec 31, 2025)
+- ✅ **Milestone 6**: Documentation Cleanup + TDD Adoption (Jan 4, 2026) 🎉
+- ⏳ **Milestone 7**: MQTT Pipeline (Week 3)
+- ⏳ **Milestone 8**: AI Features (Future)
+- ⏳ **Milestone 9**: Production Ready (Future)
 
 ---
 
@@ -329,6 +347,45 @@ Verified working features:
 - Query uploaded types via GraphQL ✅
 - Create entities with uploaded component types ✅
 - Docker deployment with all changes ✅
+
+---
+
+## ✅ Documentation Cleanup + TDD Adoption (January 4, 2026)
+
+**Status**: ✅ **COMPLETE**
+**Approach**: Streamlined documentation, Test-Driven Development
+
+### Changes Implemented
+
+#### Documentation Cleanup ✅
+- Reduced documentation to exactly 3 files:
+  - README.md (How to run and use)
+  - ARCHITECTURE.md (How the system is designed)
+  - ROADMAP.md (Where the project is going)
+- Removed CLAUDE.md
+- Established policy: No additional .md files
+- Established policy: No example code in documentation
+
+#### Test-Driven Development (TDD) Adoption ✅
+- Adopted TDD as primary development approach
+- Write tests first, then implementation
+- Ensures high test coverage from the start
+- Prevents regressions
+
+#### Hybrid ECS Architecture Clarification ✅
+- Documented Property Graph → ECS mapping
+- Clarified that we use Hybrid ECS (not pure ECS):
+  - Entities use ECS composition (flexible)
+  - Relationships use native graph edges (performant)
+- Added comparison: Traditional Property Graph vs Pure ECS vs Hybrid ECS
+- Confirmed Hybrid approach is optimal for BMS use cases
+
+### Benefits
+
+1. **Simpler Documentation**: Only 3 files to maintain
+2. **Better Code Quality**: TDD ensures tests are written first
+3. **Clear Architecture**: Hybrid ECS approach is well-documented
+4. **Easier Onboarding**: Documentation focused on essentials
 
 ---
 
