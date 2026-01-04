@@ -1,4 +1,5 @@
 import { InfluxDB, Point, WriteApi, QueryApi } from '@influxdata/influxdb-client';
+import { DeleteAPI } from '@influxdata/influxdb-client-apis';
 
 /**
  * InfluxDB Client for timeseries metrics storage
@@ -176,18 +177,42 @@ export class InfluxDBClient {
 
   /**
    * Delete data from InfluxDB
-   * Note: Delete API not available in current influxdb-client version
-   * Use InfluxDB UI or CLI for data deletion
+   * @param measurement - The measurement name to filter (optional, can be part of predicate)
+   * @param start - Start date for deletion range
+   * @param end - End date for deletion range
+   * @param predicate - Optional predicate for filtering data (e.g., '_measurement="temperature"')
    */
   async deleteData(
-    _measurement: string,
-    _start: Date,
-    _end: Date,
-    _predicate: string
+    measurement: string,
+    start: Date,
+    end: Date,
+    predicate?: string
   ): Promise<void> {
-    // TODO: Implement when delete API becomes available
-    console.warn('deleteData not implemented - use InfluxDB UI or CLI');
-    throw new Error('Delete API not available in current influxdb-client version');
+    if (!this.client) {
+      throw new Error('InfluxDB not connected. Call connect() first.');
+    }
+
+    const deleteAPI = new DeleteAPI(this.client);
+
+    // Build predicate: use provided predicate or default to measurement filter
+    const deletePredicate = predicate || `_measurement="${measurement}"`;
+
+    try {
+      await deleteAPI.postDelete({
+        org: this.org,
+        bucket: this.bucket,
+        body: {
+          start: start.toISOString(),
+          stop: end.toISOString(),
+          predicate: deletePredicate,
+        },
+      });
+
+      console.log(`✅ Deleted data from ${this.bucket} (${deletePredicate}) between ${start.toISOString()} and ${end.toISOString()}`);
+    } catch (error) {
+      console.error('❌ Failed to delete data from InfluxDB:', error);
+      throw error;
+    }
   }
 }
 
