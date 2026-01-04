@@ -49,12 +49,6 @@ async function runManualTests() {
     console.log('📋 Step 5: Querying component types...');
     const allTypes = await componentTypeManager.getAllComponentTypes();
     console.log(`   Total component types: ${allTypes.length}`);
-
-    const brickTypes = await componentTypeManager.getBrickComponentTypes();
-    console.log(`   Brick component types: ${brickTypes.length}`);
-
-    const customTypes = await componentTypeManager.getCustomComponentTypes();
-    console.log(`   Custom component types: ${customTypes.length}`);
     console.log('');
 
     // Step 6: Create entity with Brick components
@@ -146,7 +140,6 @@ async function runManualTests() {
         { name: 'capacity', type: 'Number', required: true },
         { name: 'chemistry', type: 'String', required: true },
       ],
-      isBrickSchema: false,
       description: 'Custom battery backup component',
     });
 

@@ -12,13 +12,12 @@ export class ComponentTypeManager {
   private memgraph = getMemgraphClient();
 
   /**
-   * Register a component type (Brick Schema or custom)
+   * Register a component type
    * Stored as :ComponentType meta-node in Memgraph
    */
   async registerComponentType(data: {
     name: string;
     properties: PropertyDefinition[];
-    isBrickSchema: boolean;
     description?: string;
   }): Promise<void> {
     await this.memgraph.executeWriteTx(async (tx) => {
@@ -26,14 +25,12 @@ export class ComponentTypeManager {
         `
         MERGE (ct:ComponentType {name: $name})
         SET ct.properties = $properties,
-            ct.isBrickSchema = $isBrickSchema,
             ct.description = $description,
             ct.updatedAt = timestamp()
         `,
         {
           name: data.name,
           properties: JSON.stringify(data.properties),
-          isBrickSchema: data.isBrickSchema,
           description: data.description || null,
         }
       );
@@ -81,45 +78,6 @@ export class ComponentTypeManager {
     );
   }
 
-  /**
-   * Get Brick Schema component types only
-   */
-  async getBrickComponentTypes(): Promise<ComponentType[]> {
-    const result = await this.memgraph.executeReadTx(async (tx) => {
-      return await tx.run(
-        `
-        MATCH (ct:ComponentType)
-        WHERE ct.isBrickSchema = true
-        RETURN ct
-        ORDER BY ct.name
-        `
-      );
-    });
-
-    return result.records.map((record: any) =>
-      this.mapToComponentType(record.get('ct').properties)
-    );
-  }
-
-  /**
-   * Get custom (user-defined) component types only
-   */
-  async getCustomComponentTypes(): Promise<ComponentType[]> {
-    const result = await this.memgraph.executeReadTx(async (tx) => {
-      return await tx.run(
-        `
-        MATCH (ct:ComponentType)
-        WHERE ct.isBrickSchema = false
-        RETURN ct
-        ORDER BY ct.name
-        `
-      );
-    });
-
-    return result.records.map((record: any) =>
-      this.mapToComponentType(record.get('ct').properties)
-    );
-  }
 
   /**
    * Check if a component type exists
@@ -139,17 +97,13 @@ export class ComponentTypeManager {
   }
 
   /**
-   * Delete a component type (only custom types)
+   * Delete a component type
    */
   async deleteComponentType(name: string): Promise<void> {
     const componentType = await this.getComponentType(name);
 
     if (!componentType) {
       throw new Error(`Component type '${name}' not found`);
-    }
-
-    if (componentType.isBrickSchema) {
-      throw new Error(`Cannot delete Brick Schema component type '${name}'`);
     }
 
     await this.memgraph.executeWriteTx(async (tx) => {
@@ -166,25 +120,17 @@ export class ComponentTypeManager {
   /**
    * Get count of component types
    */
-  async getCount(): Promise<{ total: number; brick: number; custom: number }> {
+  async getCount(): Promise<number> {
     const result = await this.memgraph.executeReadTx(async (tx) => {
       return await tx.run(
         `
         MATCH (ct:ComponentType)
-        RETURN
-          count(ct) as total,
-          count(CASE WHEN ct.isBrickSchema = true THEN 1 END) as brick,
-          count(CASE WHEN ct.isBrickSchema = false THEN 1 END) as custom
+        RETURN count(ct) as total
         `
       );
     });
 
-    const record = result.records[0];
-    return {
-      total: record.get('total').toNumber(),
-      brick: record.get('brick').toNumber(),
-      custom: record.get('custom').toNumber(),
-    };
+    return result.records[0].get('total').toNumber();
   }
 
   /**
@@ -236,7 +182,6 @@ export class ComponentTypeManager {
       properties: typeof props.properties === 'string'
         ? JSON.parse(props.properties)
         : props.properties,
-      isBrickSchema: props.isBrickSchema,
       description: props.description,
     };
   }

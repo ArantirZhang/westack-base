@@ -24,7 +24,6 @@ type Component {
 type ComponentType {
   name: String!
   properties: [PropertyDefinition!]!
-  isBrickSchema: Boolean!   # true if from Brick Schema, false if custom
   description: String
 }
 
@@ -62,7 +61,6 @@ type RelationshipType {
   fromEntity: String!       # Component type or "Any"
   toEntity: String!
   properties: [PropertyDefinition!]!
-  isBrickSchema: Boolean!
   description: String
 }
 
@@ -141,13 +139,10 @@ type Query {
   # Component Type Registry
   componentTypes: [ComponentType!]!
   componentType(name: String!): ComponentType
-  brickComponentTypes: [ComponentType!]!     # Brick Schema only
-  customComponentTypes: [ComponentType!]!    # User-defined only
 
   # Relationship Type Registry
   relationshipTypes: [RelationshipType!]!
   relationshipType(name: String!): RelationshipType
-  brickRelationshipTypes: [RelationshipType!]!
 
   # Entity Relationship Queries
   entityRelationships(entityId: ID!, type: String): [Relationship!]!
@@ -173,6 +168,9 @@ type Mutation {
   defineComponentType(input: DefineComponentTypeInput!): ComponentType!
   defineRelationshipType(input: DefineRelationshipTypeInput!): RelationshipType!
 
+  # Brick Schema Upload
+  uploadBrickSchema(content: String!): BrickSchemaUploadResult!
+
   # Relationship Operations
   createRelationship(input: CreateRelationshipInput!): Boolean!
   deleteRelationship(fromId: ID!, toId: ID!, type: String!): Boolean!
@@ -181,6 +179,13 @@ type Mutation {
 # ============================================
 # Supporting Types
 # ============================================
+
+type BrickSchemaUploadResult {
+  success: Boolean!
+  componentTypesLoaded: Int!
+  relationshipTypesLoaded: Int!
+  errors: [String!]!
+}
 
 type SystemInfo {
   status: String!

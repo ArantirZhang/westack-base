@@ -43,13 +43,11 @@ describe('ECS with Brick Schema', () => {
     it('should have Equipment component type', async () => {
       const equipment = await componentTypeManager.getComponentType('Equipment');
       expect(equipment).toBeDefined();
-      expect(equipment?.isBrickSchema).toBe(true);
     });
 
     it('should have AHU component type', async () => {
       const ahu = await componentTypeManager.getComponentType('AHU');
       expect(ahu).toBeDefined();
-      expect(ahu?.isBrickSchema).toBe(true);
     });
 
     it('should load Brick relationship types', async () => {
@@ -60,7 +58,6 @@ describe('ECS with Brick Schema', () => {
     it('should have feeds relationship type', async () => {
       const feeds = await relationshipTypeManager.getRelationshipType('feeds');
       expect(feeds).toBeDefined();
-      expect(feeds?.isBrickSchema).toBe(true);
     });
   });
 
@@ -245,13 +242,11 @@ describe('ECS with Brick Schema', () => {
           { name: 'chemistry', type: 'String', required: true },
           { name: 'runtime', type: 'Number', required: false },
         ],
-        isBrickSchema: false,
         description: 'Battery backup system for equipment',
       });
 
       const batteryType = await componentTypeManager.getComponentType('BatteryBackup');
       expect(batteryType).toBeDefined();
-      expect(batteryType?.isBrickSchema).toBe(false);
     });
 
     it('should use custom component type on entity', async () => {
@@ -272,33 +267,12 @@ describe('ECS with Brick Schema', () => {
   describe('Component Type Queries', () => {
     it('should get all component types', async () => {
       const allTypes = await componentTypeManager.getAllComponentTypes();
-      expect(allTypes.length).toBeGreaterThan(20); // Should have many Brick types
-    });
-
-    it('should filter Brick component types only', async () => {
-      const brickTypes = await componentTypeManager.getBrickComponentTypes();
-      expect(brickTypes.length).toBeGreaterThan(0);
-
-      for (const type of brickTypes) {
-        expect(type.isBrickSchema).toBe(true);
-      }
-    });
-
-    it('should filter custom component types only', async () => {
-      const customTypes = await componentTypeManager.getCustomComponentTypes();
-      expect(customTypes.length).toBeGreaterThan(0);
-
-      for (const type of customTypes) {
-        expect(type.isBrickSchema).toBe(false);
-      }
+      expect(allTypes.length).toBeGreaterThan(20); // Should have many types
     });
 
     it('should count component types', async () => {
-      const counts = await componentTypeManager.getCount();
-      expect(counts.total).toBeGreaterThan(0);
-      expect(counts.brick).toBeGreaterThan(0);
-      expect(counts.custom).toBeGreaterThan(0);
-      expect(counts.total).toBe(counts.brick + counts.custom);
+      const count = await componentTypeManager.getCount();
+      expect(count).toBeGreaterThan(0);
     });
   });
 

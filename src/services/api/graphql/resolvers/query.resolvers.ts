@@ -91,14 +91,6 @@ export const queryResolvers = {
       return componentTypeManager.getComponentType(args.name);
     },
 
-    brickComponentTypes: async () => {
-      return componentTypeManager.getBrickComponentTypes();
-    },
-
-    customComponentTypes: async () => {
-      return componentTypeManager.getCustomComponentTypes();
-    },
-
     // ============================================
     // Relationship Type Registry Queries
     // ============================================
@@ -109,10 +101,6 @@ export const queryResolvers = {
 
     relationshipType: async (_parent: any, args: { name: string }) => {
       return relationshipTypeManager.getRelationshipType(args.name);
-    },
-
-    brickRelationshipTypes: async () => {
-      return relationshipTypeManager.getBrickRelationshipTypes();
     },
 
     // ============================================

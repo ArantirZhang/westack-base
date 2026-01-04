@@ -1,14 +1,14 @@
 # WeStack BMS - Implementation Roadmap
 
 **Last Updated**: December 31, 2025
-**Current Status**: ✅ Week 2 Complete - ECS with Brick Schema Running in Docker
+**Current Status**: ✅ Dynamic Brick Schema Upload Implemented
 **Version**: 1.0.0
 
 ---
 
 ## 🎯 Project Status
 
-### Current Phase: Week 2 Complete - ECS with Brick Schema Operational
+### Current Phase: Dynamic Brick Schema Upload Implemented
 
 **Dependencies**: ✅ All upgraded to latest versions (Dec 27, 2025)
 **Security**: ✅ 0 vulnerabilities
@@ -16,9 +16,10 @@
 **Server**: ✅ Apollo Server v4 running with ECS GraphQL schema
 **Databases**: ✅ InfluxDB + Memgraph clients operational
 **GraphQL**: ✅ Full ECS schema with Entity/Component/Relationship types
-**Brick Schema**: ✅ 21 component types + 10 relationship types loaded
+**Brick Schema**: ✅ Dynamic upload via GraphQL mutation
+**Architecture**: ✅ Simplified - no isBrickSchema distinction
 **Docker**: ✅ All containers healthy (app, memgraph, influxdb, mosquitto)
-**Tests**: ✅ Integration tests + manual test script created
+**Tests**: ✅ Integration tests + upload verified
 **Next Step**: Week 3 - MQTT Ingestion Pipeline
 
 ### What's Been Completed (December 27-31, 2025)
@@ -65,7 +66,22 @@
 - [x] All TypeScript compilation errors resolved
 - [x] Docker containers running healthy
 
-**Progress**: Foundation 100% ✅ | Dependencies 100% ✅ | Core Implementation 100% ✅ | ECS + Brick Schema 100% ✅
+#### Phase 4: Dynamic Brick Schema Upload ✅
+- [x] Removed isBrickSchema field from ComponentType and RelationshipType
+- [x] Simplified component type registry (no Brick vs custom distinction)
+- [x] Created BrickSchemaConverter service
+- [x] TTL/RDF format parser
+- [x] JSON format parser
+- [x] Auto-format detection
+- [x] uploadBrickSchema GraphQL mutation
+- [x] BrickSchemaUploadResult type
+- [x] Upload validation and error handling
+- [x] Integration with existing component type manager
+- [x] Tested with JSON format upload
+- [x] All TypeScript compilation successful
+- [x] Docker deployment verified
+
+**Progress**: Foundation 100% ✅ | Dependencies 100% ✅ | Core Implementation 100% ✅ | ECS + Brick Schema 100% ✅ | Dynamic Upload 100% ✅
 
 ---
 
@@ -77,11 +93,12 @@ Dependencies:         ███████████████████�
 Documentation:        ████████████████████ 100% ✅
 Core Server:          ████████████████████ 100% ✅ (ECS + Brick Schema operational)
 Database Clients:     ████████████████████ 100% ✅ (Services created)
-Brick Schema:         ████████████████████ 100% ✅ (21 types loaded)
+Brick Schema:         ████████████████████ 100% ✅ (Dynamic upload via GraphQL)
 ECS GraphQL Schema:   ████████████████████ 100% ✅ (Entity/Component/Relationship)
-Component Registry:   ████████████████████ 100% ✅ (ComponentType manager)
+Component Registry:   ████████████████████ 100% ✅ (Simplified, no isBrickSchema)
 Data Models:          ████████████████████ 100% ✅ (ECS TypeScript models)
 Storage Services:     ████████████████████ 100% ✅ (EntityManager, writers)
+Schema Upload:        ████████████████████ 100% ✅ (TTL/RDF + JSON support)
 Docker Deployment:    ████████████████████ 100% ✅ (All containers healthy)
 MQTT Ingestion:       ░░░░░░░░░░░░░░░░░░░░   0% ⏳ (Week 3)
 Testing:              ████░░░░░░░░░░░░░░░░  20% ⏳ (Manual tests only)
@@ -91,10 +108,11 @@ Testing:              ████░░░░░░░░░░░░░░░�
 - ✅ **Milestone 1**: Dependencies Fixed (Dec 27, 2025)
 - ✅ **Milestone 2**: Complete Upgrade (Dec 27, 2025)
 - ✅ **Milestone 3**: Working Server (Dec 27, 2025)
-- ✅ **Milestone 4**: ECS + Brick Schema (Dec 31, 2025) 🎉
-- ⏳ **Milestone 5**: MQTT Pipeline (Week 3)
-- ⏳ **Milestone 6**: AI Features (Future)
-- ⏳ **Milestone 7**: Production Ready (Future)
+- ✅ **Milestone 4**: ECS + Brick Schema (Dec 31, 2025)
+- ✅ **Milestone 5**: Dynamic Brick Schema Upload (Dec 31, 2025) 🎉
+- ⏳ **Milestone 6**: MQTT Pipeline (Week 3)
+- ⏳ **Milestone 7**: AI Features (Future)
+- ⏳ **Milestone 8**: Production Ready (Future)
 
 ---
 
@@ -212,9 +230,8 @@ Testing:              ████░░░░░░░░░░░░░░░�
 
 **GraphQL Queries**:
 - `{ hello }` - Returns ECS greeting
-- `{ componentTypes { name isBrickSchema } }` - Returns 21 Brick types
-- `{ brickComponentTypes { name } }` - Returns Brick types only
-- `{ relationshipTypes { name } }` - Returns 10 relationship types
+- `{ componentTypes { name description } }` - Returns all component types
+- `{ relationshipTypes { name } }` - Returns relationship types
 - `{ entity(id: "...") { components { componentType } } }` - Query entities
 
 **Docker Status**:
@@ -233,8 +250,85 @@ curl -X POST http://localhost:8080/ \
 # Get component types
 curl -X POST http://localhost:8080/ \
   -H "Content-Type: application/json" \
-  -d '{"query":"{ brickComponentTypes { name } }"}'
+  -d '{"query":"{ componentTypes { name description } }"}'
 ```
+
+---
+
+## ✅ Dynamic Brick Schema Upload (December 31, 2025)
+
+**Status**: ✅ **COMPLETE**
+**Architecture**: Dynamic Brick Schema upload and conversion via GraphQL API
+
+### Changes Implemented
+
+#### Removed isBrickSchema Distinction ✅
+- Removed `isBrickSchema` field from ComponentType and RelationshipType
+- All component types are now treated equally (no distinction between Brick and custom)
+- Removed `brickComponentTypes` and `customComponentTypes` queries
+- Simplified component type registry
+
+#### Created Brick Schema Converter Service ✅
+**File**: `src/services/schema/brick-schema-converter.service.ts`
+- Parses Brick Schema from TTL/RDF format
+- Parses Brick Schema from JSON format
+- Auto-detects format and converts to ComponentType/RelationshipType
+- Returns upload result with success status and error details
+
+#### Added uploadBrickSchema Mutation ✅
+**GraphQL Mutation**:
+```graphql
+mutation {
+  uploadBrickSchema(content: String!): BrickSchemaUploadResult!
+}
+```
+
+**Usage Example (JSON Format)**:
+```graphql
+mutation {
+  uploadBrickSchema(content: "{\"componentTypes\": [{...}]}") {
+    success
+    componentTypesLoaded
+    relationshipTypesLoaded
+    errors
+  }
+}
+```
+
+**Usage Example (TTL Format)**:
+```graphql
+mutation {
+  uploadBrickSchema(content: "brick:AHU a owl:Class ; rdfs:label \"Air Handler\" .") {
+    success
+    componentTypesLoaded
+    relationshipTypesLoaded
+    errors
+  }
+}
+```
+
+#### Updated Architecture ✅
+- Brick Schema types are no longer pre-loaded on startup by default
+- Users can upload Brick Schema v1.3 or custom ontologies dynamically
+- Existing Brick loader still works for initial schema population
+- All component types stored uniformly in Memgraph without special flags
+
+### Benefits
+
+1. **Flexibility**: Upload any Brick Schema version or custom ontology
+2. **Simplicity**: No distinction between Brick and custom types
+3. **Extensibility**: Easy to add new component types at runtime
+4. **Interoperability**: Support for standard Brick Schema TTL/RDF format
+5. **Developer-Friendly**: Also supports simple JSON format for quick testing
+
+### Testing
+
+Verified working features:
+- Upload component types via JSON format ✅
+- Upload relationship types via JSON format ✅
+- Query uploaded types via GraphQL ✅
+- Create entities with uploaded component types ✅
+- Docker deployment with all changes ✅
 
 ---
 

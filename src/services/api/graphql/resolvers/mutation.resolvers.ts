@@ -7,11 +7,13 @@
 import { ComponentTypeManager } from '../../../schema/component-type-manager.service';
 import { RelationshipTypeManager } from '../../../schema/relationship-type-manager.service';
 import { EntityManager } from '../../../storage/entity-manager.service';
+import { BrickSchemaConverter } from '../../../schema/brick-schema-converter.service';
 
 // Initialize services
 const componentTypeManager = new ComponentTypeManager();
 const relationshipTypeManager = new RelationshipTypeManager();
 const entityManager = new EntityManager(componentTypeManager);
+const brickSchemaConverter = new BrickSchemaConverter(componentTypeManager, relationshipTypeManager);
 
 export const mutationResolvers = {
   Mutation: {
@@ -114,7 +116,6 @@ export const mutationResolvers = {
       await componentTypeManager.registerComponentType({
         name,
         properties: properties as any,
-        isBrickSchema: false,
         description,
       });
 
@@ -145,11 +146,18 @@ export const mutationResolvers = {
         fromEntity,
         toEntity,
         properties: (properties as any) || [],
-        isBrickSchema: false,
         description,
       });
 
       return relationshipTypeManager.getRelationshipType(name);
+    },
+
+    // ============================================
+    // Brick Schema Upload
+    // ============================================
+
+    uploadBrickSchema: async (_parent: any, args: { content: string }) => {
+      return brickSchemaConverter.loadBrickSchema(args.content);
     },
 
     // ============================================

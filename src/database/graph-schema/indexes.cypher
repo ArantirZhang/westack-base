@@ -7,13 +7,11 @@
 -- Entity nodes - index on ID for fast lookups
 CREATE INDEX ON :Entity(id);
 
--- ComponentType meta-nodes - index on name and isBrickSchema
+-- ComponentType meta-nodes - index on name
 CREATE INDEX ON :ComponentType(name);
-CREATE INDEX ON :ComponentType(isBrickSchema);
 
--- RelationshipType meta-nodes - index on name and isBrickSchema
+-- RelationshipType meta-nodes - index on name
 CREATE INDEX ON :RelationshipType(name);
-CREATE INDEX ON :RelationshipType(isBrickSchema);
 
 -- Component nodes - index on type for filtering
 CREATE INDEX ON :Component(type);

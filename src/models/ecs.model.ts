@@ -32,7 +32,6 @@ export interface Component {
 export interface ComponentType {
   name: string;
   properties: PropertyDefinition[];
-  isBrickSchema: boolean;       // true if from Brick Schema, false if custom
   description?: string;
 }
 
@@ -66,7 +65,6 @@ export interface RelationshipType {
   fromEntity: string;           // Component type or "Any"
   toEntity: string;             // Component type or "Any"
   properties: PropertyDefinition[];
-  isBrickSchema: boolean;
   description?: string;
 }
 

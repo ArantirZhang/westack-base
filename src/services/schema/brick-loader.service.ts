@@ -30,7 +30,6 @@ export class BrickSchemaLoader {
         await this.componentTypeManager.registerComponentType({
           name: componentType.name,
           properties: componentType.properties,
-          isBrickSchema: true,
           description: componentType.description,
         });
       }
@@ -43,7 +42,6 @@ export class BrickSchemaLoader {
           fromEntity: relType.domain,
           toEntity: relType.range,
           properties: relType.properties || [],
-          isBrickSchema: true,
           description: relType.description,
         });
       }
